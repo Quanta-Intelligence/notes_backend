@@ -56,10 +56,13 @@ def store_nodes(nodes) -> None:
 
 def fetch_node(id: str) -> dict:
     content = json.loads(index.fetch(ids=[id]).get('vectors').get(id).get('metadata').get('data'))
-    for i, c in enumerate(content):
+    result = []
+    for c in content:
         if c.get('type') == 'node':
-            content[i] = fetch_node(c.get('id'))
-    return content
+            result.extend(fetch_node(c.get('id')))
+        else:
+            result.append(c)
+    return result
 
 def flatten_nodes(nodes, level=6, result=[]) -> list[dict]:
     start = None
@@ -94,6 +97,10 @@ async def save_nodes(request: Request) -> None:
 @ app.get('/node/{id}')
 async def load_node(id: str, request: Request) -> dict:
     return fetch_node(id)
+
+@ app.get('/delete/{id}')
+async def delete_node(id: str, request: Request) -> None:
+    index.delete(ids=[id])
 
 @ app.get('/children/{id}')
 async def children(id: str, request: Request) -> dict:
