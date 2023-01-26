@@ -98,7 +98,7 @@ async def save_nodes(request: Request) -> None:
 async def load_node(id: str, request: Request) -> dict:
     return fetch_node(id)
 
-@ app.get('/delete/{id}')
+@ app.post('/delete/{id}')
 async def delete_node(id: str, request: Request) -> None:
     index.delete(ids=[id])
 
