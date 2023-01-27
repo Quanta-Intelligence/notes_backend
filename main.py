@@ -77,8 +77,7 @@ def flatten_nodes(nodes, level=6, result=[]) -> list[dict]:
             result.append([nodes[start]] + node_content)
             to_slice.extend(node_content)
             node_content.clear()
-            nodes[start] = {'type': 'node', 'name': get_raw_content(
-                nodes[start]), 'id': nodes[start].get('attrs').get('id')}
+            nodes[start] = {'type': 'node', 'name': get_raw_content(nodes[start]), 'id': nodes[start].get('attrs').get('id')}
         if n.get('type') == 'heading' and n.get('attrs').get('level') == level:
             start = i
         elif n.get('type') == 'heading':
