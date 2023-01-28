@@ -11,10 +11,10 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=['*'],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 
 pinecone.init(api_key='06bb24b7-2061-460e-9ba6-c9f8dfbbb736', environment='us-west1-gcp')
@@ -29,7 +29,7 @@ def get_raw_content(node) -> str:
             content = content + n.get('text')
     return content
 
-def embed_nodes(nodes, dim=16) -> tuple[list[float], list[float]]:
+def embed_nodes(nodes: list[dict], dim=16) -> tuple[list[float], list[float]]:
     embeddings = []
     magnitudes = []
     for node in nodes:
@@ -41,9 +41,10 @@ def embed_nodes(nodes, dim=16) -> tuple[list[float], list[float]]:
         embeddings.append(embedding)
     return embeddings, magnitudes
 
-def store_nodes(nodes) -> None:
+def store_nodes(nodes: list[dict]) -> None:
     nodes.reverse()
     embeddings, magnitudes = embed_nodes(nodes)
+    filter(lambda n: get_raw_content(n[0]) != '', nodes)
     index.upsert([(
         nodes[i][0].get('attrs').get('id'),
         embeddings[i],
@@ -64,7 +65,7 @@ def fetch_node(id: str) -> dict:
             result.append(c)
     return result
 
-def flatten_nodes(nodes, level=6, result=[]) -> list[dict]:
+def flatten_nodes(nodes: list[dict], level=6, result=[]) -> list[dict]:
     start = None
     node_content = []
     to_slice = []
@@ -116,5 +117,4 @@ async def children(id: str, request: Request) -> dict:
     return result
 
 if __name__ == '__main__':
-    clear_database()
     uvicorn.run('main:app', host='127.0.0.1', port=8080, reload=True)
