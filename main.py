@@ -55,7 +55,7 @@ def store_nodes(nodes: list[dict]) -> None:
         }
     ) for i in range(len(nodes))])
 
-def fetch_node(id: str) -> dict:
+def fetch_node(id: str) -> list[dict]:
     content = json.loads(index.fetch(ids=[id]).get('vectors').get(id).get('metadata').get('data'))
     result = []
     for c in content:
@@ -95,7 +95,7 @@ async def save_nodes(request: Request) -> None:
     store_nodes(flatten_nodes(data['content']))
 
 @ app.get('/node/{id}')
-async def load_node(id: str, request: Request) -> dict:
+async def load_node(id: str, request: Request) -> list[dict]:
     return fetch_node(id)
 
 @ app.post('/delete/{id}')
